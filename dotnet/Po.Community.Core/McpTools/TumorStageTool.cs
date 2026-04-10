@@ -68,11 +68,13 @@ public class TumorStageTool(ILogger<TumorStageTool> logger) : IMcpTool
             );
         }
 
-        logger.LogInformation("Tumor stage lookup succeeded");
+
 
         var stageText = (observation.Value as CodeableConcept)?.Text
             ?? observation.Code?.Text
             ?? "unknown";
+
+        logger.LogInformation("Tumor stage lookup succeeded with stage {StageText}", stageText);
 
         return McpToolUtilities.CreateTextToolResponse(
             $"The patient's tumor stage is: {stageText}"
@@ -102,7 +104,7 @@ public class TumorStageTool(ILogger<TumorStageTool> logger) : IMcpTool
 
         foreach (var searchVariant in GetPatientSearchVariants(patientId))
         {
-            var parameters = new List<string> { searchVariant.Query, $"code={TumorStageCode}" };
+            var parameters = new List<string> { searchVariant.Query, $"code={TumorStageCode}", "_sort=-date", "_count=1" };
 
             try
             {
